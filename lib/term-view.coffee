@@ -4,6 +4,7 @@ fs = require 'fs-plus'
 path = require 'path'
 debounce = require 'debounce'
 Terminal = require 'xterm'
+Terminal.loadAddon('fit')
 {CompositeDisposable} = require 'atom'
  # see https://github.com/f/atom-term.js/pull/5
  # see https://github.com/f/atom-term.js/pull/4
@@ -76,11 +77,8 @@ class TermView extends View
     {cols, rows, cwd, shell, shellArguments, shellOverride, runCommand, colors, cursorBlink, scrollback} = @opts
     args = shellArguments.split(/\s+/g).filter (arg) -> arg
 
-    if @opts.forkPTY
-      {cols, rows} = @getDimensions_()
-
     @term = term = new Terminal {
-      colors, cursorBlink, scrollback, cols, rows
+      colors, cursorBlink, scrollback
     }
 
     term.on "data", (data) =>
@@ -107,6 +105,8 @@ class TermView extends View
       @emitter.emit 'did-change-title', title
 
     term.open this.get(0)
+    term.fit()
+    { cols, rows } = @getDimensions
 
     if not @opts.forkPTY
       term.end = => @exit()
@@ -132,13 +132,12 @@ class TermView extends View
 
   resize: (cols, rows) ->
     return unless @term
-    return if @term.rows is rows and @term.cols is cols
     return unless cols > 0 and rows > 0 and isFinite(cols) and isFinite(rows)
     # console.log @term.rows, @term.cols, "->", rows, cols
     try
       if @ptyProcess
         @ptyProcess.send {event: 'resize', rows, cols}
-      if @term
+      if @term and not (@term.rows is rows and @term.cols is cols)
         @term.resize cols, rows
     catch error
       console.error error
@@ -216,26 +215,14 @@ class TermView extends View
     @term.focus()
 
   resizeToPane_: ->
-    return unless @ptyProcess
-    {cols, rows} = @getDimensions_()
+    return unless @ptyProcess and @term
+    @term.fit()
+    {cols, rows} = @getDimensions()
     @resize cols, rows
 
   getDimensions: ->
     cols = @term.cols
     rows = @term.rows
-    {cols, rows}
-
-  getDimensions_: ->
-    if not @term
-      cols = Math.floor @width() / 7
-      rows = Math.floor @height() / 15
-      return {cols, rows}
-
-    @find('.terminal').append @fakeRow
-    fakeCol = @fakeRow.children().first()
-    cols = Math.floor (@width() / fakeCol.width()) or 9
-    rows = Math.floor (@height() / fakeCol.height()) or 16
-    @fakeRow.remove()
     {cols, rows}
 
   exit: ->
