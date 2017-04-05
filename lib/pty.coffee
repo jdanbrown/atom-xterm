@@ -33,4 +33,4 @@ module.exports = (ptyCwd, sh, cols, rows, args) ->
   process.on 'message', ({event, cols, rows, text}={}) ->
     switch event
       when 'resize' then ptyProcess.resize(cols, rows)
-      when 'input' then ptyProcess.write(new Buffer(text, "base64").toString("utf-8"))
+      when 'input' then ptyProcess.write(new Buffer(text, "base64"))

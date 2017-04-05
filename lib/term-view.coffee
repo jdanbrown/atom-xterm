@@ -3,7 +3,7 @@ os = require 'os'
 fs = require 'fs-plus'
 path = require 'path'
 debounce = require 'debounce'
-Terminal = require 'atom-term.js'
+Terminal = require 'xterm'
 {CompositeDisposable} = require 'atom'
  # see https://github.com/f/atom-term.js/pull/5
  # see https://github.com/f/atom-term.js/pull/4
@@ -61,7 +61,7 @@ class TermView extends View
     return unless @term
     try
       if @ptyProcess
-        base64ed = new Buffer(data).toString("base64")
+        base64ed = Buffer.from(data, 'binary').toString('base64')
         @ptyProcess.send event: 'input', text: base64ed
       else
         @term.write data
@@ -80,10 +80,6 @@ class TermView extends View
       {cols, rows} = @getDimensions_()
 
     @term = term = new Terminal {
-      useStyle: no
-      screenKeys: no
-      handler: (data) =>
-        @emitter.emit 'stdin', data
       colors, cursorBlink, scrollback, cols, rows
     }
 

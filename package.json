@@ -9,17 +9,17 @@
     "atom": ">=0.121.0"
   },
   "dependencies": {
-    "atom-term.js": "https://github.com/Floobits/atom-term.js/archive/4bd056eca0d03e5420472df91923e3e4bb0aaeed.tar.gz",
     "atom-space-pen-views": "^2.0.3",
     "debounce": "1.0.x",
+    "event-kit": "1.5.x",
+    "flukes": "0.1.x",
     "fs-plus": "^2.2.3",
     "keypather": "^1.3.2",
-    "flukes": "0.1.x",
     "ptyw.js": "0.4.x",
-    "event-kit": "1.5.x",
     "react-atom-fork": "0.11.x",
     "react-tools": "0.11.x",
-    "reactionary-atom-fork": "1.x"
+    "reactionary-atom-fork": "1.x",
+    "xterm": "^2.4.0"
   },
   "devDependencies": {
     "eslint": "2.x",
