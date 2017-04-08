@@ -159,13 +159,6 @@ module.exports =
     focusNextTick = (activeItem) ->
       process.nextTick ->
         termView.focus()
-        # HACK!
-        # so, term.js allows for a special _textarea because of iframe shenanigans,
-        # but, it is the constructor instead of the instance!!!1 - probably to avoid having to bind this as a premature
-        # optimization.
-        atomPane = activeItem.parentsUntil("atom-pane").parent()[0]
-        if termView.term
-          termView.term.constructor._textarea = atomPane
 
     subscriptions.add pane.onDidActivate ->
       activeItem = pane.getActiveItem()
