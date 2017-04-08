@@ -103,6 +103,9 @@ class TermView extends View
       @title_ = title
       @emitter.emit 'did-change-title', title
 
+    term.on "selection", ({ contents }) =>
+      atom.clipboard.write contents
+
     term.open this.get(0)
     term.fit()
     { cols, rows } = @getDimensions
@@ -184,23 +187,6 @@ class TermView extends View
     $(window).on 'resize', => @resizeToPane_()
     @disposable.add atom.workspace.getActivePane().observeFlexScale => setTimeout (=> @resizeToPane_()), 300
     @disposable.add atom.commands.add "atom-workspace", "term3:paste", => @paste()
-    @disposable.add atom.commands.add "atom-workspace", "term3:copy", => @copy()
-
-  copy: ->
-    return unless @term
-
-    if @term._selected  # term.js visual mode selections
-      textarea = @term.getCopyTextarea()
-      text = @term.grabText(
-        @term._selected.x1, @term._selected.x2,
-        @term._selected.y1, @term._selected.y2)
-    else # fallback to DOM-based selections
-      rawText = @term.context.getSelection().toString()
-      rawLines = rawText.split(/\r?\n/g)
-      lines = rawLines.map (line) ->
-        line.replace(/\s/g, " ").trimRight()
-      text = lines.join("\n")
-    atom.clipboard.write text
 
   paste: ->
     @input atom.clipboard.read()
