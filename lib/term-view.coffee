@@ -26,7 +26,6 @@ renderTemplate = (template, data) ->
 class TermView extends View
   constructor: (@opts={})->
     @emitter = new Emitter
-    @fakeRow = $("<div><span>&nbsp;</span></div>").css visibility: 'hidden'
     super
 
   focusPane: () ->
