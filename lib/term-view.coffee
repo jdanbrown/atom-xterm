@@ -57,6 +57,9 @@ class TermView extends View
   onSTDOUT: (callback) ->
     @emitter.on 'stdout', callback
 
+  onFocus: (callback) ->
+    @emitter.on 'focus', callback
+
   input: (data) ->
     return unless @term
     try
@@ -105,6 +108,9 @@ class TermView extends View
 
     term.on "selection", ({ contents }) =>
       atom.clipboard.write contents
+
+    term.on "focus", =>
+      @emitter.emit "focus"
 
     term.open this.get(0)
     term.fit()

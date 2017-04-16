@@ -164,7 +164,6 @@ module.exports =
       activeItem = pane.getActiveItem()
       if activeItem != item
         return
-      @focusedTerminal = termView
       termView.focus()
       focusNextTick activeItem
 
@@ -177,6 +176,11 @@ module.exports =
 
     subscriptions.add termView.onExit () ->
       Terminals.remove termView.id
+      if @focusedTerminal == termView
+        @focusedTerminal = off
+
+    subscriptions.add termView.onFocus () =>
+      @focusedTerminal = termView
 
     subscriptions.add pane.onWillRemoveItem (itemRemoved, index) =>
       if itemRemoved.item == item
@@ -231,10 +235,7 @@ module.exports =
     termView.on 'click', =>
       # get focus in the terminal
       # avoid double click to get focus
-      termView.term.element.focus()
       termView.term.focus()
-
-      @focusedTerminal = termView
 
     termView.onDidChangeTitle () ->
       if forkPTY
@@ -288,7 +289,7 @@ module.exports =
       else
         item = @focusedTerminal
 
-      item.pty.write stream.trim()
+      item.input stream.trim()
       item.term.focus()
 
   handleRemoveTerm: (termView)->
