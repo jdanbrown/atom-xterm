@@ -135,9 +135,13 @@ module.exports =
     @disposables.add atom.commands.add "atom-workspace", "term3:pipe-path", @pipeTerm.bind(this, 'path')
     @disposables.add atom.commands.add "atom-workspace", "term3:pipe-selection", @pipeTerm.bind(this, 'selection')
 
-    atom.packages.activatePackage('tree-view').then (treeViewPkg) =>
+    @disposables.add atom.packages.onDidActivatePackage((pkg) ->
+      return unless pkg.name == 'tree-view'
       node = new ListView()
-      treeViewPkg.mainModule.treeView.find(".tree-view-scroller").prepend node
+      treeView = pkg.mainModule.treeView.element
+      el = treeView.querySelector('.tree-view-scroller')
+      el.insertBefore(node, el.firstChild)
+    )
 
   service_0_1_3: () ->
     {
