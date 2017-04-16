@@ -3,12 +3,11 @@
 "use strict";
 
 var React = require("react-atom-fork");
-var flux = require("flukes");
-var terminals = require("../terminal-model");
+var store = require("../store");
 
 var TerminalView = React.createClass({
   propTypes: {
-    terminal: React.PropTypes.instanceOf(terminals),
+    terminal: React.PropTypes.object.isRequired,
   },
   onMouseDown: function () {
     this.props.terminal.open();
@@ -24,14 +23,39 @@ var TerminalView = React.createClass({
   }
 });
 
+function mapStateToProps(state) {
+  return {
+    terminals: state.terminals,
+  };
+}
+
 var ListView = React.createClass({
-  mixins: [flux.createAutoBinder([], [terminals])],
+  propTypes: {
+    terminals: React.PropTypes.array.isRequired,
+  },
+  getInitialState: function () {
+    return ({ terminals: store.getState().terminals });
+  },
+  componentWillMount: function () {
+    var that = this;
+    this.unsubscribeStore = store.subscribe(function () {
+      that.setState({
+        terminals: store.getState().terminals,
+      })
+    });
+  },
+  componentWillUnmount: function () {
+    if (typeof this.unsubscribeStore === 'function') {
+      this.unsubscribeStore();
+    }
+  },
   render: function () {
     // XXXX: Horrible hack to work around a bug in Atom. Sometimes, Atom will erase NODE_ENV when run from the command line
     if (!process.env.NODE_ENV) {
       process.env.NODE_ENV = "production";
     }
-    if (!terminals.length) {
+    const terminals = this.state.terminals;
+    if (terminals == null || !terminals.length) {
       return (<div></div>);
     }
     const terms = terminals.map(function (t) {
@@ -55,7 +79,8 @@ const HTMLElementProto = Object.create(HTMLElement.prototype);
 // };
 
 HTMLElementProto.attachedCallback = function () {
-  this.reactNode = React.renderComponent(ListView({}), this);
+  this.reactNode =
+    React.renderComponent(ListView({ store: store }), this);
 };
 
 // HTMLElementProto.attributeChangedCallback = function (attrName, oldVal, newVal) {

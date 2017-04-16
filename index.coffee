@@ -1,7 +1,7 @@
 path = require 'path'
 TermView = require './lib/term-view'
 ListView = require './lib/build/list-view'
-Terminals = require './lib/terminal-model'
+store = require './lib/store'
 {Emitter}  = require 'event-kit'
 keypather  = do require 'keypather'
 {CompositeDisposable} = require 'event-kit'
@@ -147,8 +147,7 @@ module.exports =
     }
 
   getTerminals: ->
-    Terminals.map (t) ->
-      t.term
+    store.getState().terminals.map t -> t.term
 
   onTerm: (callback) ->
     @emitter.on 'term', callback
@@ -175,9 +174,9 @@ module.exports =
       focusNextTick activeItem
 
     subscriptions.add termView.onExit () ->
-      Terminals.remove termView.id
       if @focusedTerminal == termView
         @focusedTerminal = off
+      store.removeTerminal(termView)
 
     subscriptions.add termView.onFocus () =>
       @focusedTerminal = termView
@@ -185,7 +184,7 @@ module.exports =
     subscriptions.add pane.onWillRemoveItem (itemRemoved, index) =>
       if itemRemoved.item == item
         item.destroy()
-        Terminals.remove termView.id
+        store.removeTerminal(termView)
         @disposables.remove subscriptions
         subscriptions.dispose()
 
@@ -223,11 +222,11 @@ module.exports =
     opts.cwd = opts.cwd or atom.project.getPaths()[0] or editorPath or process.env.HOME
 
     termView = new TermView opts
-    model = Terminals.add {
+    model = store.addTerminal({
       local: !!forkPTY,
       term: termView,
       title: title,
-    }
+    }).terminal
     id = model.id
     termView.id = id
 
@@ -238,10 +237,12 @@ module.exports =
       termView.term.focus()
 
     termView.onDidChangeTitle () ->
+      newTitle = null
       if forkPTY
-        model.title = termView.getTitle()
+        newTitle = termView.getTitle()
       else
-        model.title = title + '-' + termView.getTitle()
+        newTitle = title + '-' + termView.getTitle()
+      store.updateTerminal({ id: termView.id, title: newTitle })
 
     @termViews.push? termView
     process.nextTick () => @emitter.emit 'term', termView
@@ -290,7 +291,7 @@ module.exports =
         item = @focusedTerminal
 
       item.input stream.trim()
-      item.term.focus()
+      item.focus()
 
   handleRemoveTerm: (termView)->
     @termViews.splice @termViews.indexOf(termView), 1
