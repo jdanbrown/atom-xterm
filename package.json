@@ -20,7 +20,7 @@
     "react-tools": "0.11.x",
     "reactionary-atom-fork": "1.x",
     "redux": "^3.6.0",
-    "xterm": "^2.4.0"
+    "xterm": "^2.5.0"
   },
   "devDependencies": {
     "eslint": "2.x",
