@@ -23,6 +23,30 @@ renderTemplate = (template, data) ->
       .join data[key]
   , template.toString()
 
+createColorsStyleSheet = (parent, termID, colors) ->
+  termHTMLID = "term3-term-#{termID}"
+  title = "#{termHTMLID}-colors"
+  ss = document.querySelector("style[title=\"#{title}\"]")
+  if ss != null
+    ssEl.parentElement.removeChild(ssEl)
+  styles = "\##{termHTMLID} { color: red; }"
+  stylePrefix = "\##{termHTMLID} "
+  styles = []
+  addStyle = (s) -> styles.push(stylePrefix + s)
+
+  i = 0
+  for c in colors.slice(0, 16)
+    addStyle(".xterm-color-#{i} { color: #{c}; }")
+    addStyle(".xterm-bg-color-#{i} { background-color: #{c}; }")
+    i += 1
+  addStyle(".terminal { background: #{colors[16]}; color: #{colors[17]}}")
+  addStyle(".xterm-viewport { background: #{colors[16]}; color: #{colors[17]}}")
+
+  ssEl = document.createElement('style')
+  ssEl.title = title
+  ssEl.innerHTML = styles.join("\n")
+  parent.appendChild(ssEl)
+
 class TermView extends View
   constructor: (@opts={})->
     @emitter = new Emitter
@@ -79,6 +103,10 @@ class TermView extends View
     {cols, rows, cwd, shell, shellArguments, shellOverride, runCommand, colors, cursorBlink, scrollback} = @opts
     args = shellArguments.split(/\s+/g).filter (arg) -> arg
 
+    parent = this.get(0)
+
+    createColorsStyleSheet(parent, this.id, colors)
+
     @term = term = new Terminal {
       colors, cursorBlink, scrollback
     }
@@ -112,7 +140,10 @@ class TermView extends View
     term.on "focus", =>
       @emitter.emit "focus"
 
-    term.open this.get(0)
+    term.open parent
+
+    term.element.id = "term3-term-#{this.id}"
+
     term.fit()
     { cols, rows } = @getDimensions
 
