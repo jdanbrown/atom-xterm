@@ -45,17 +45,17 @@ createColorsStyleSheet = (parent, termID, colors) ->
   if ss != null
     ssEl.parentElement.removeChild(ssEl)
   styles = "\##{termHTMLID} { color: red; }"
-  stylePrefix = "\##{termHTMLID} "
+  stylePrefix = "\##{termHTMLID}"
   styles = []
   addStyle = (s) -> styles.push(stylePrefix + s)
 
   i = 0
   for c in colors.slice(0, 16)
-    addStyle(".xterm-color-#{i} { color: #{c}; }")
-    addStyle(".xterm-bg-color-#{i} { background-color: #{c}; }")
+    addStyle(" .xterm-color-#{i} { color: #{c}; }")
+    addStyle(" .xterm-bg-color-#{i} { background-color: #{c}; }")
     i += 1
-  addStyle(".terminal { background: #{colors[16]}; color: #{colors[17]}}")
-  addStyle(".xterm-viewport { background: #{colors[16]}; color: #{colors[17]}}")
+  addStyle(".terminal { background: #{colors[16]}; color: #{colors[17]}; }")
+  addStyle(" .xterm-viewport { background: #{colors[16]}; color: #{colors[17]}; }")
 
   ssEl = document.createElement('style')
   ssEl.title = title
