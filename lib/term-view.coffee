@@ -10,6 +10,21 @@ Terminal.loadAddon('fit')
  # see https://github.com/f/atom-term.js/pull/4
 window.isMac = window.navigator.userAgent.indexOf('Mac') != -1;
 
+(->
+  origBindMouse = Terminal.prototype.bindMouse
+  Terminal.prototype.bindMouse = ->
+    out = origBindMouse.call(this)
+    Terminal.on(this.element, 'mouseup', =>
+      return if this.mouseEvents
+      sel = window.getSelection()
+      return if sel == null || sel.rangeCount < 1
+      selStr = sel.getRangeAt(0).toString()
+      if selStr != ''
+        this.emit('selection', {contents: selStr})
+    )
+    return out
+)()
+
 {Task} = require 'atom'
 {Emitter}  = require 'event-kit'
 {$, View} = require 'atom-space-pen-views'
