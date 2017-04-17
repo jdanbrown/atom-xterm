@@ -21,15 +21,27 @@
     "xterm": "^2.5.0"
   },
   "devDependencies": {
-    "eslint": "2.x",
-    "eslint-config-floobits": "*",
-    "eslint-plugin-react": "4.x"
+    "babel-eslint": "^7.2.2",
+    "eslint": "^3.19.0",
+    "eslint-plugin-prettier": "^2.0.1",
+    "eslint-plugin-react": "^6.10.3",
+    "husky": "^0.13.3",
+    "lint-staged": "^3.4.0",
+    "prettier": "^1.2.2"
   },
   "scripts": {
     "build": "npm run install",
     "lint": "eslint lib templates",
     "watch": "jsx --watch --harmony templates lib/build",
+    "precommit": "lint-staged",
     "install": "jsx --harmony templates lib/build"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write --single-quote --trailing-comma all",
+      "eslint",
+      "git add"
+    ]
   },
   "providedServices": {
     "term3-service": {

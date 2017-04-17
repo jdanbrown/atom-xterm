@@ -1,20 +1,24 @@
 {
+  "parser": "babel-eslint",
   "env": {
     "browser": true,
     "es6": true,
     "node": true
   },
-  "extends": ["eslint-config-floobits", "plugin:react/recommended"],
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
   "globals": {
     "atom": false,
     "document": false,
     "window": false
   },
   "plugins": [
+    "prettier",
     "react"
   ],
   "rules": {
     "consistent-this": [1, "that"],
+    "no-console": ["error", { allow: ["warn", "error"] }],
+    "prettier/prettier": ["error", {"trailingComma": "all", "singleQuote": true}],
     "react/no-deprecated": [1],
     "react/no-is-mounted": [1],
   },
