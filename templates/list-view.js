@@ -23,12 +23,6 @@ var TerminalView = React.createClass({
   },
 });
 
-function mapStateToProps(state) {
-  return {
-    terminals: state.terminals,
-  };
-}
-
 var ListView = React.createClass({
   propTypes: {
     terminals: React.PropTypes.array.isRequired,
