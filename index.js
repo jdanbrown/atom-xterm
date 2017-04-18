@@ -50,7 +50,7 @@ const getColors = function() {
     brightWhite,
     background,
     foreground,
-  ].map(color => color.toHexString());
+  ].map(color => (color.toHexString == null ? color : color.toHexString()));
 };
 
 const config = {
@@ -227,7 +227,23 @@ export default {
       ),
     );
 
-    return this.disposables.add(
+    this.disposables.add(
+      atom.workspace.addOpener(uri => {
+        if (uri === 'atom://term3-term-view') {
+          return this.newTerm();
+        }
+      }),
+    );
+
+    this.disposables.add(
+      atom.workspace.observeActivePaneItem(item => {
+        if (item instanceof TermView) {
+          item.focus();
+        }
+      }),
+    );
+
+    this.disposables.add(
       atom.packages.onDidActivatePackage(function(pkg) {
         if (pkg.name !== 'tree-view') {
           return;
@@ -256,68 +272,10 @@ export default {
     return this.emitter.on('term', callback);
   },
 
-  attachSubscriptions(termView, item, pane) {
-    const subscriptions = new CompositeDisposable();
-
-    const focusNextTick = () => process.nextTick(() => termView.focus());
-
-    subscriptions.add(
-      pane.onDidActivate(function() {
-        const activeItem = pane.getActiveItem();
-        if (activeItem !== item) {
-          return;
-        }
-        termView.focus();
-        return focusNextTick(activeItem);
-      }),
-    );
-
-    subscriptions.add(
-      pane.onDidChangeActiveItem(function(activeItem) {
-        if (activeItem !== termView) {
-          if (termView.term) {
-            termView.term.constructor._textarea = null;
-          }
-          return;
-        }
-        return focusNextTick(activeItem);
-      }),
-    );
-
-    subscriptions.add(
-      termView.onExit(function() {
-        if (this.focusedTerminal === termView) {
-          this.focusedTerminal = false;
-        }
-        return store.removeTerminal(termView);
-      }),
-    );
-
-    subscriptions.add(
-      termView.onFocus(() => {
-        return (this.focusedTerminal = termView);
-      }),
-    );
-
-    subscriptions.add(
-      pane.onWillRemoveItem(itemRemoved => {
-        if (itemRemoved.item === item) {
-          item.destroy();
-          store.removeTerminal(termView);
-          this.disposables.remove(subscriptions);
-          return subscriptions.dispose();
-        }
-      }),
-    );
-
-    return subscriptions;
-  },
-
   newTerm(forkPTY = true, rows = 30, cols = 80, title = 'tty') {
     const termView = this.createTermView(forkPTY, rows, cols, title);
     const pane = atom.workspace.getActivePane();
     const item = pane.addItem(termView);
-    this.disposables.add(this.attachSubscriptions(termView, item, pane));
     pane.activateItem(item);
     return termView;
   },
@@ -343,7 +301,6 @@ export default {
       opts.shell = process.env.SHELL || 'bash';
     }
 
-    // opts.shellArguments or= ''
     const editorPath = keypather.get(
       atom,
       'workspace.getEditorViews[0].getEditor().getPath()',
@@ -360,11 +317,12 @@ export default {
     const { id } = model;
     termView.id = id;
 
-    termView.on('remove', this.handleRemoveTerm.bind(this));
+    termView.onExit(() => this.handleRemoveTerm(termView));
+
     termView.on('click', () => {
       // get focus in the terminal
       // avoid double click to get focus
-      return termView.term.focus();
+      return termView.focus();
     });
 
     termView.onDidChangeTitle(function() {
@@ -376,6 +334,8 @@ export default {
       }
       return store.updateTerminal({ id: termView.id, title: newTitle });
     });
+
+    termView.onFocus(() => (this.focusedTerminal = termView));
 
     if (typeof this.termViews.push === 'function') {
       this.termViews.push(termView);
@@ -394,9 +354,6 @@ export default {
       pane = activePane[`split${direction}`]({ items: [termView] });
       activePane.termSplits[direction] = pane;
       this.focusedTerminal = [pane, pane.items[0]];
-      return this.disposables.add(
-        this.attachSubscriptions(termView, pane.items[0], pane),
-      );
     };
 
     var activePane = atom.workspace.getActivePane();
@@ -412,9 +369,6 @@ export default {
         const item = pane.addItem(termView);
         pane.activateItem(item);
         this.focusedTerminal = [pane, item];
-        return this.disposables.add(
-          this.attachSubscriptions(termView, item, pane),
-        );
       } else {
         return splitter();
       }
@@ -453,17 +407,17 @@ export default {
   },
 
   handleRemoveTerm(termView) {
-    return this.termViews.splice(this.termViews.indexOf(termView), 1);
+    store.removeTerminal(termView);
+    this.termViews.splice(this.termViews.indexOf(termView), 1);
   },
 
   deactivate() {
     this.termViews.forEach(view => view.exit());
     this.termViews = [];
-    return this.disposables.dispose;
+    this.disposables.dispose();
   },
 
-  serialize() {
-    const termViewsState = this.termViews.map(view => view.serialize());
-    return { termViews: termViewsState };
+  deserializeTermView() {
+    return this.createTermView();
   },
 };
