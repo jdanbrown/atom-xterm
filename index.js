@@ -10,7 +10,7 @@ import { CompositeDisposable } from 'event-kit';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
 
-const getColors = function() {
+const getColors = function(colors) {
   const {
     normalBlack,
     normalRed,
@@ -30,7 +30,7 @@ const getColors = function() {
     brightWhite,
     background,
     foreground,
-  } = atom.config.getAll('term3.colors')[0].value;
+  } = colors;
   return [
     normalBlack,
     normalRed,
@@ -52,6 +52,33 @@ const getColors = function() {
     foreground,
   ].map(color => (color.toHexString == null ? color : color.toHexString()));
 };
+
+function createColorsStyleSheet(colors) {
+  const title = 'term3-colors';
+  let ssEl = document.querySelector(`style[title=\"${title}\"]`);
+  if (ssEl != null) {
+    ssEl.parentElement.removeChild(ssEl);
+  }
+  const stylePrefix = '.term3 .terminal';
+  let styles = [];
+  const addStyle = s => styles.push(stylePrefix + s);
+
+  let i = 0;
+  for (let c of Array.from(colors.slice(0, 16))) {
+    addStyle(` .xterm-color-${i} { color: ${c}; }`);
+    addStyle(` .xterm-bg-color-${i} { background-color: ${c}; }`);
+    i += 1;
+  }
+  addStyle(` { background: ${colors[16]}; color: ${colors[17]}; }`);
+  addStyle(
+    ` .xterm-viewport { background: ${colors[16]}; color: ${colors[17]}; }`,
+  );
+
+  ssEl = document.createElement('style');
+  ssEl.title = title;
+  ssEl.innerHTML = styles.join('\n');
+  return document.querySelector('head').appendChild(ssEl);
+}
 
 const config = {
   autoRunCommand: {
@@ -206,6 +233,12 @@ export default {
     });
 
     this.disposables.add(
+      atom.config.observe('term3.colors', cs =>
+        createColorsStyleSheet(getColors(cs)),
+      ),
+    );
+
+    this.disposables.add(
       atom.commands.add(
         'atom-workspace',
         'term3:open',
@@ -289,7 +322,6 @@ export default {
       cursorBlink: atom.config.get('term3.cursorBlink'),
       fontFamily: atom.config.get('term3.fontFamily'),
       fontSize: atom.config.get('term3.fontSize'),
-      colors: getColors(),
       forkPTY,
       rows,
       cols,
