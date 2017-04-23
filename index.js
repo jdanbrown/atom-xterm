@@ -193,15 +193,15 @@ const config = {
     default: '',
   },
   shellArguments: {
-    type: 'string',
+    type: 'array',
     default: (({ SHELL, HOME }) => {
       switch (path.basename(SHELL && SHELL.toLowerCase())) {
         case 'bash':
-          return `--init-file ${path.join(HOME, '.bash_profile')}`;
+          return ['--init-file', path.join(HOME, '.bash_profile')];
         case 'zsh':
-          return '-l';
+          return ['-l'];
         default:
-          return '';
+          return [];
       }
     })(process.env),
   },
