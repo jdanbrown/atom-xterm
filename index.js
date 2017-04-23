@@ -1,16 +1,16 @@
 'use babel';
 
 import path from 'path';
+import { CompositeDisposable, Emitter } from 'event-kit';
 import TermView from './lib/term-view';
 import ListView from './lib/build/list-view';
 import store from './lib/store';
-import { Emitter } from 'event-kit';
+
 const keypather = require('keypather')();
-import { CompositeDisposable } from 'event-kit';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
 
-const getColors = function(colors) {
+function getColors(colors) {
   const {
     normalBlack,
     normalRed,
@@ -51,20 +51,20 @@ const getColors = function(colors) {
     background,
     foreground,
   ].map(color => (color.toHexString == null ? color : color.toHexString()));
-};
+}
 
 function createColorsStyleSheet(colors) {
   const title = 'term3-colors';
-  let ssEl = document.querySelector(`style[title=\"${title}\"]`);
+  let ssEl = document.querySelector(`style[title="${title}"]`);
   if (ssEl != null) {
     ssEl.parentElement.removeChild(ssEl);
   }
   const stylePrefix = '.term3 .terminal';
-  let styles = [];
+  const styles = [];
   const addStyle = s => styles.push(stylePrefix + s);
 
   let i = 0;
-  for (let c of Array.from(colors.slice(0, 16))) {
+  for (const c of Array.from(colors.slice(0, 16))) {
     addStyle(` .xterm-color-${i} { color: ${c}; }`);
     addStyle(` .xterm-bg-color-${i} { background-color: ${c}; }`);
     i += 1;
@@ -188,7 +188,7 @@ const config = {
   },
   shellArguments: {
     type: 'string',
-    default: (function({ SHELL, HOME }) {
+    default: (({ SHELL, HOME }) => {
       switch (path.basename(SHELL && SHELL.toLowerCase())) {
         case 'bash':
           return `--init-file ${path.join(HOME, '.bash_profile')}`;
@@ -222,15 +222,15 @@ export default {
       );
     }
 
-    ['up', 'right', 'down', 'left'].forEach(direction => {
-      return this.disposables.add(
+    ['up', 'right', 'down', 'left'].forEach(direction =>
+      this.disposables.add(
         atom.commands.add(
           'atom-workspace',
           `term3:open-split-${direction}`,
           this.splitTerm.bind(this, direction),
         ),
-      );
-    });
+      ),
+    );
 
     this.disposables.add(
       atom.config.observe('term3.colors', cs =>
@@ -263,7 +263,7 @@ export default {
     this.disposables.add(
       atom.workspace.addOpener(uri => {
         if (uri === 'atom://term3-term-view') {
-          return this.newTerm();
+          this.newTerm();
         }
       }),
     );
@@ -277,14 +277,14 @@ export default {
     );
 
     this.disposables.add(
-      atom.packages.onDidActivatePackage(function(pkg) {
+      atom.packages.onDidActivatePackage(pkg => {
         if (pkg.name !== 'tree-view') {
           return;
         }
         const node = new ListView();
         const treeView = pkg.mainModule.treeView.element;
         const el = treeView.querySelector('.tree-view-scroller');
-        return el.insertBefore(node, el.firstChild);
+        el.insertBefore(node, el.firstChild);
       }),
     );
   },
@@ -354,17 +354,17 @@ export default {
     termView.on('click', () => {
       // get focus in the terminal
       // avoid double click to get focus
-      return termView.focus();
+      termView.focus();
     });
 
-    termView.onDidChangeTitle(function() {
+    termView.onDidChangeTitle(() => {
       let newTitle = null;
       if (forkPTY) {
         newTitle = termView.getTitle();
       } else {
-        newTitle = title + '-' + termView.getTitle();
+        newTitle = `${title}-${termView.getTitle()}`;
       }
-      return store.updateTerminal({ id: termView.id, title: newTitle });
+      store.updateTerminal({ id: termView.id, title: newTitle });
     });
 
     termView.onFocus(() => {
@@ -383,11 +383,12 @@ export default {
     return termView;
   },
 
-  splitTerm(direction) {
+  splitTerm(dir) {
     let pane;
     const openPanesInSameSplit = atom.config.get('term3.openPanesInSameSplit');
     const termView = this.createTermView();
-    direction = capitalize(direction);
+    const direction = capitalize(dir);
+    const activePane = atom.workspace.getActivePane();
 
     const splitter = () => {
       pane = activePane[`split${direction}`]({ items: [termView] });
@@ -395,7 +396,6 @@ export default {
       this.focusedTerminal = [pane, pane.items[0]];
     };
 
-    var activePane = atom.workspace.getActivePane();
     if (!activePane.termSplits) {
       activePane.termSplits = {};
     }
@@ -409,10 +409,10 @@ export default {
         pane.activateItem(item);
         this.focusedTerminal = [pane, item];
       } else {
-        return splitter();
+        splitter();
       }
     } else {
-      return splitter();
+      splitter();
     }
   },
 
@@ -427,21 +427,24 @@ export default {
           return editor.getBuffer().file.path;
         case 'selection':
           return editor.getSelectedText();
+        default:
+          return null;
       }
     })();
 
-    if (stream && this.focusedTerminal) {
-      let item;
-      if (Array.isArray(this.focusedTerminal)) {
-        let pane;
-        [pane, item] = Array.from(this.focusedTerminal);
-        pane.activateItem(item);
-      } else {
-        item = this.focusedTerminal;
-      }
+    const itemInput = i => {
+      i.input(stream.trim());
+      i.focus();
+    };
 
-      item.input(stream.trim());
-      return item.focus();
+    if (stream && this.focusedTerminal) {
+      if (Array.isArray(this.focusedTerminal)) {
+        const [pane, item] = Array.from(this.focusedTerminal);
+        pane.activateItem(item);
+        itemInput(item);
+      } else {
+        itemInput(this.focusedTerminal);
+      }
     }
   },
 

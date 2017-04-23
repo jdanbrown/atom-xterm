@@ -1,28 +1,34 @@
 /** @jsx React.DOM */
+// 'use babel';
+
 /* global HTMLElement */
-'use strict';
 
-var React = require('react-atom-fork');
-var store = require('../store');
+/* eslint-disable import/no-unresolved, import/extensions */
+// import store from '../store';
 
-var TerminalView = React.createClass({
+// import * as React from 'react-atom-fork';
+const React = require('react-atom-fork');
+const store = require('../store');
+
+/* eslint-disable react/prefer-es6-class */
+const TerminalView = React.createClass({
   propTypes: {
     terminal: React.PropTypes.object.isRequired,
-    selected: React.PropTypes.bool,
+    selected: React.PropTypes.bool.isRequired,
   },
 
-  onMouseDown: function(e) {
+  onMouseDown(e) {
     e.stopPropagation();
     this.props.terminal.open();
   },
 
-  render: function() {
+  render() {
     const t = this.props.terminal;
     const sel = this.props.selected;
     return (
       <li
-        onMouseDown={this.onMouseDown.bind(this)}
-        className={(sel ? 'selected' : '') + ' list-item'}
+        onMouseDown={this.onMouseDown}
+        className={`${sel ? 'selected' : ''} list-item`}
       >
         <span className="icon icon-terminal">{t.title}</span>
       </li>
@@ -30,18 +36,19 @@ var TerminalView = React.createClass({
   },
 });
 
-var ListView = React.createClass({
+/* eslint-disable react/prefer-es6-class, react/no-multi-comp */
+const ListView = React.createClass({
   propTypes: {
-    terminals: React.PropTypes.array.isRequired,
+    terminals: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
   },
 
-  getInitialState: function() {
+  getInitialState() {
     return { terminals: store.getState().terminals };
   },
 
-  componentWillMount: function() {
-    var that = this;
-    this.unsubscribeStore = store.subscribe(function() {
+  componentWillMount() {
+    const that = this;
+    this.unsubscribeStore = store.subscribe(() => {
       const { terminals, activeTerminalId } = store.getState();
       that.setState({
         terminals,
@@ -50,19 +57,20 @@ var ListView = React.createClass({
     });
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     if (typeof this.unsubscribeStore === 'function') {
       this.unsubscribeStore();
     }
   },
 
-  toggleCollapse: function() {
+  toggleCollapse() {
     const { collapsed } = this.state;
     this.setState({ collapsed: !collapsed });
   },
 
-  render: function() {
-    // XXXX: Horrible hack to work around a bug in Atom. Sometimes, Atom will erase NODE_ENV when run from the command line
+  render() {
+    // XXXX: Horrible hack to work around a bug in Atom. Sometimes, Atom will
+    // erase NODE_ENV when run from the command line
     if (!process.env.NODE_ENV) {
       process.env.NODE_ENV = 'production';
     }
@@ -70,15 +78,13 @@ var ListView = React.createClass({
     if (terminals == null || !terminals.length) {
       return <div />;
     }
-    const terms = terminals.map(function(t) {
-      return (
-        <TerminalView
-          terminal={t}
-          selected={t.id === activeTerminalId}
-          key={t.id}
-        />
-      );
-    });
+    const terms = terminals.map(t => (
+      <TerminalView
+        terminal={t}
+        selected={t.id === activeTerminalId}
+        key={t.id}
+      />
+    ));
     return (
       <ol className="list-tree has-collapsable-children">
         <li
@@ -86,7 +92,8 @@ var ListView = React.createClass({
         >
           <div
             className="header list-item project-root-header"
-            onClick={this.toggleCollapse.bind(this)}
+            role="menuitem"
+            onClick={this.toggleCollapse}
           >
             <span className="name icon icon-terminal">terminals</span>
           </div>
@@ -105,8 +112,9 @@ const HTMLElementProto = Object.create(HTMLElement.prototype);
 //   return;
 // };
 
-HTMLElementProto.attachedCallback = function() {
-  this.reactNode = React.renderComponent(ListView({ store: store }), this);
+HTMLElementProto.attachedCallback = function attachedCallback() {
+  // eslint-disable-next-line react/no-deprecated
+  this.reactNode = React.renderComponent(ListView({ store }), this);
 };
 
 // HTMLElementProto.attributeChangedCallback = function (attrName, oldVal, newVal) {
