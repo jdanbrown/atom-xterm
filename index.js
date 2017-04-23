@@ -6,8 +6,6 @@ import TermView from './lib/term-view';
 import ListView from './lib/build/list-view';
 import store from './lib/store';
 
-const keypather = require('keypather')();
-
 const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
 
 function getColors(colors) {
@@ -51,6 +49,14 @@ function getColors(colors) {
     background,
     foreground,
   ].map(color => (color.toHexString == null ? color : color.toHexString()));
+}
+
+function getFirstEditorPath() {
+  const editors = atom.workspace.getTextEditors();
+  if (editors.length > 0) {
+    return editors[0].getPath();
+  }
+  return undefined;
 }
 
 function createColorsStyleSheet(colors) {
@@ -333,12 +339,11 @@ export default {
       opts.shell = process.env.SHELL || 'bash';
     }
 
-    const editorPath = keypather.get(
-      atom,
-      'workspace.getEditorViews[0].getEditor().getPath()',
-    );
     opts.cwd =
-      opts.cwd || atom.project.getPaths()[0] || editorPath || process.env.HOME;
+      opts.cwd ||
+      atom.project.getPaths()[0] ||
+      getFirstEditorPath() ||
+      process.env.HOME;
 
     const termView = new TermView(opts);
     const model = store.addTerminal({
