@@ -392,7 +392,6 @@ export default {
     const splitter = () => {
       pane = activePane[`split${direction}`]({ items: [termView] });
       activePane.termSplits[direction] = pane;
-      this.focusedTerminal = [pane, pane.items[0]];
     };
 
     if (!activePane.termSplits) {
@@ -406,7 +405,6 @@ export default {
         pane = activePane.termSplits[direction];
         const item = pane.addItem(termView);
         pane.activateItem(item);
-        this.focusedTerminal = [pane, item];
       } else {
         splitter();
       }
@@ -431,19 +429,9 @@ export default {
       }
     })();
 
-    const itemInput = i => {
-      i.input(stream.trim());
-      i.focus();
-    };
-
     if (stream && this.focusedTerminal) {
-      if (Array.isArray(this.focusedTerminal)) {
-        const [pane, item] = Array.from(this.focusedTerminal);
-        pane.activateItem(item);
-        itemInput(item);
-      } else {
-        itemInput(this.focusedTerminal);
-      }
+      this.focusedTerminal.input(stream.trim());
+      this.focusedTerminal.focusAndActivatePane();
     }
   },
 
