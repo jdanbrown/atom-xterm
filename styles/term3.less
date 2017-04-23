@@ -3,22 +3,18 @@
 // See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
 // for a full listing of what's available.
 
-// @import "ui-variables";
-// @import "tree-view";
+@import "ui-variables";
 
 terminal-list-view {
   display: flex;
-  .header {
-    margin-top: 10px;
-    img {
-      width: 22px;
-      padding-right: 5px;
-    }
-    margin-left: 21px;
+  isolation: isolate;
+  min-width: -webkit-min-content;
+  padding-left: @component-icon-padding;
+  padding-right: @component-padding;
+  padding-bottom: @component-padding;
+  position: relative;
+
+  .project-root .header .name {
+    line-height: 3em;
   }
-  ul {
-    margin-left: -24px;
-    list-style-type: none;
-    margin-top: 5px;
-  }
-} 
+}
