@@ -367,7 +367,14 @@ export default {
       return store.updateTerminal({ id: termView.id, title: newTitle });
     });
 
-    termView.onFocus(() => (this.focusedTerminal = termView));
+    termView.onFocus(() => {
+      this.focusedTerminal = termView;
+      store.setActiveTerminal(termView);
+    });
+
+    termView.onBlur(() => {
+      store.setActiveTerminal(null);
+    });
 
     if (typeof this.termViews.push === 'function') {
       this.termViews.push(termView);

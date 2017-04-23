@@ -42,10 +42,10 @@ var ListView = React.createClass({
   componentWillMount: function() {
     var that = this;
     this.unsubscribeStore = store.subscribe(function() {
-      const { terminals, selectedTerminalId } = store.getState();
+      const { terminals, activeTerminalId } = store.getState();
       that.setState({
         terminals,
-        selectedTerminalId,
+        activeTerminalId,
       });
     });
   },
@@ -66,7 +66,7 @@ var ListView = React.createClass({
     if (!process.env.NODE_ENV) {
       process.env.NODE_ENV = 'production';
     }
-    const { terminals, selectedTerminalId, collapsed } = this.state;
+    const { terminals, activeTerminalId, collapsed } = this.state;
     if (terminals == null || !terminals.length) {
       return <div />;
     }
@@ -74,7 +74,7 @@ var ListView = React.createClass({
       return (
         <TerminalView
           terminal={t}
-          selected={t.id === selectedTerminalId}
+          selected={t.id === activeTerminalId}
           key={t.id}
         />
       );
