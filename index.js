@@ -314,6 +314,7 @@ export default {
   newTerm(forkPTY = true, rows = 30, cols = 80, title = 'tty') {
     const termView = this.createTermView(forkPTY, rows, cols, title);
     const pane = atom.workspace.getActivePane();
+    termView.attachTermToPane(pane);
     const item = pane.addItem(termView);
     pane.activateItem(item);
     return termView;
@@ -411,6 +412,8 @@ export default {
     } else {
       splitter();
     }
+
+    termView.attachTermToPane(pane);
   },
 
   pipeTerm(action) {
