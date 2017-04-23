@@ -9,9 +9,9 @@
     "atom": ">=0.121.0"
   },
   "dependencies": {
-    "atom-space-pen-views": "^2.0.3",
-    "debounce": "1.0.x",
-    "event-kit": "1.5.x",
+    "debounce": "^1.0.2",
+    "element-resize-detector": "^1.1.11",
+    "event-kit": "^2.3.0",
     "fs-plus": "^2.2.3",
     "ptyw.js": "0.4.x",
     "react-atom-fork": "0.11.x",

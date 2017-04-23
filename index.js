@@ -356,12 +356,6 @@ export default {
 
     termView.onExit(() => this.handleRemoveTerm(termView));
 
-    termView.on('click', () => {
-      // get focus in the terminal
-      // avoid double click to get focus
-      termView.focus();
-    });
-
     termView.onDidChangeTitle(() => {
       let newTitle = null;
       if (forkPTY) {
