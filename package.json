@@ -15,7 +15,6 @@
     "fs-plus": "^2.2.3",
     "ptyw.js": "0.4.x",
     "react-atom-fork": "0.11.x",
-    "react-tools": "0.11.x",
     "redux": "^3.6.0",
     "xterm": "^2.5.0"
   },
@@ -32,11 +31,8 @@
     "prettier": "^1.2.2"
   },
   "scripts": {
-    "build": "npm run install",
     "lint": "eslint lib templates",
-    "watch": "jsx --watch --harmony templates lib/build",
-    "precommit": "lint-staged",
-    "install": "jsx --harmony templates lib/build"
+    "precommit": "lint-staged"
   },
   "lint-staged": {
     "*.js": [

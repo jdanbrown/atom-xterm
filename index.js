@@ -3,7 +3,7 @@
 import path from 'path';
 import { CompositeDisposable, Emitter } from 'event-kit';
 import TermView from './lib/term-view';
-import ListView from './lib/build/list-view';
+import ListView from './lib/list-view';
 import store from './lib/store';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
