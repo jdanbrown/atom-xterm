@@ -6,7 +6,7 @@
   "repository": "https://github.com/Floobits/atom-term3",
   "license": "MIT",
   "engines": {
-    "atom": ">=0.121.0"
+    "atom": ">=1.16.0"
   },
   "dependencies": {
     "debounce": "^1.0.2",
