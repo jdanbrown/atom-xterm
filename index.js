@@ -60,12 +60,12 @@ function getFirstEditorPath() {
 }
 
 function createColorsStyleSheet(colors) {
-  const title = 'term3-colors';
+  const title = 'xterm-colors';
   let ssEl = document.querySelector(`style[title="${title}"]`);
   if (ssEl != null) {
     ssEl.parentElement.removeChild(ssEl);
   }
-  const stylePrefix = '.term3 .terminal';
+  const stylePrefix = '.xterm .terminal';
   const styles = [];
   const addStyle = s => styles.push(stylePrefix + s);
 
@@ -224,7 +224,7 @@ export default {
 
     if (!process.env.LANG) {
       console.warn(
-        'Term3: LANG environment variable is not set. Fancy characters (å, ñ, ó, etc`) may be corrupted. The only work-around is to quit Atom and run `atom` from your shell.',
+        'xterm: LANG environment variable is not set. Fancy characters (å, ñ, ó, etc`) may be corrupted. The only work-around is to quit Atom and run `atom` from your shell.',
       );
     }
 
@@ -232,14 +232,14 @@ export default {
       this.disposables.add(
         atom.commands.add(
           'atom-workspace',
-          `term3:open-split-${direction}`,
+          `xterm:open-split-${direction}`,
           this.splitTerm.bind(this, direction),
         ),
       ),
     );
 
     this.disposables.add(
-      atom.config.observe('term3.colors', cs =>
+      atom.config.observe('xterm.colors', cs =>
         createColorsStyleSheet(getColors(cs)),
       ),
     );
@@ -247,28 +247,28 @@ export default {
     this.disposables.add(
       atom.commands.add(
         'atom-workspace',
-        'term3:open',
+        'xterm:open',
         this.newTerm.bind(this),
       ),
     );
     this.disposables.add(
       atom.commands.add(
         'atom-workspace',
-        'term3:pipe-path',
+        'xterm:pipe-path',
         this.pipeTerm.bind(this, 'path'),
       ),
     );
     this.disposables.add(
       atom.commands.add(
         'atom-workspace',
-        'term3:pipe-selection',
+        'xterm:pipe-selection',
         this.pipeTerm.bind(this, 'selection'),
       ),
     );
 
     this.disposables.add(
       atom.workspace.addOpener(uri => {
-        if (uri === 'atom://term3-term-view') {
+        if (uri === 'atom://xterm-term-view') {
           this.newTerm();
         }
       }),
@@ -295,7 +295,7 @@ export default {
     );
   },
 
-  service_0_1_3() {
+  provideServiceV1_0_0() {
     return {
       getTerminals: this.getTerminals.bind(this),
       onTerm: this.onTerm.bind(this),
@@ -314,7 +314,7 @@ export default {
   newTerm(forkPTY = true, rows = 30, cols = 80, title = 'tty') {
     const termView = this.createTermView(forkPTY, rows, cols, title);
     const pane = atom.workspace.getActivePane();
-    termView.attachTermToPane(pane);
+    termView.attachToPane(pane);
     const item = pane.addItem(termView);
     pane.activateItem(item);
     return termView;
@@ -322,13 +322,13 @@ export default {
 
   createTermView(forkPTY = true, rows = 30, cols = 80, title = 'tty') {
     const opts = {
-      runCommand: atom.config.get('term3.autoRunCommand'),
-      shellOverride: atom.config.get('term3.shellOverride'),
-      shellArguments: atom.config.get('term3.shellArguments'),
-      titleTemplate: atom.config.get('term3.titleTemplate'),
-      cursorBlink: atom.config.get('term3.cursorBlink'),
-      fontFamily: atom.config.get('term3.fontFamily'),
-      fontSize: atom.config.get('term3.fontSize'),
+      runCommand: atom.config.get('xterm.autoRunCommand'),
+      shellOverride: atom.config.get('xterm.shellOverride'),
+      shellArguments: atom.config.get('xterm.shellArguments'),
+      titleTemplate: atom.config.get('xterm.titleTemplate'),
+      cursorBlink: atom.config.get('xterm.cursorBlink'),
+      fontFamily: atom.config.get('xterm.fontFamily'),
+      fontSize: atom.config.get('xterm.fontSize'),
       forkPTY,
       rows,
       cols,
@@ -385,7 +385,7 @@ export default {
 
   splitTerm(dir) {
     let pane;
-    const openPanesInSameSplit = atom.config.get('term3.openPanesInSameSplit');
+    const openPanesInSameSplit = atom.config.get('xterm.openPanesInSameSplit');
     const termView = this.createTermView();
     const direction = capitalize(dir);
     const activePane = atom.workspace.getActivePane();
@@ -413,7 +413,7 @@ export default {
       splitter();
     }
 
-    termView.attachTermToPane(pane);
+    termView.attachToPane(pane);
   },
 
   pipeTerm(action) {

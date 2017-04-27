@@ -1,0 +1,40 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+# 'context-menu':
+#   '.overlayer':
+#       'Open terminal here': 'term:open'
+
+'menu': [
+  'label': 'Packages'
+  'submenu': [
+    'label': 'xterm'
+    'submenu': [
+      {'label': 'Open New Terminal in New Tab', 'command': 'xterm:open'}
+      {'label': 'Open New Terminal in Right Pane', 'command': 'xterm:open-split-right'}
+      {'label': 'Open New Terminal in Bottom Pane', 'command': 'xterm:open-split-down'}
+      {'label': 'Open New Terminal in Top Pane', 'command': 'xterm:open-split-up'}
+      {'label': 'Open New Terminal in Left Pane', 'command': 'xterm:open-split-left'}
+    ]
+  ]
+]
+'context-menu':
+  '.xterm': [
+    {
+      'label': 'Copy'
+      'command': 'xterm:copy'
+    }
+    {
+      'label': 'Paste'
+      'command': 'xterm:paste'
+    }
+  ]
+
+  '.overlayer': [
+    {
+      'label': 'xterm: Pipe selection to last Terminal session'
+      'command': 'xterm:pipe-selection'
+    }
+    {
+      'label': 'xterm: Pipe file path to the Terminal session'
+      'command': 'xterm:pipe-path'
+    }
+  ]

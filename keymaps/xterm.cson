@@ -1,0 +1,32 @@
+# Keybindings require three things to be fully defined: A selector that is
+# matched against the focused element, the keystroke and the command to
+# execute.
+#
+# Below is a basic keybinding which registers on all platforms by applying to
+# the root workspace element.
+
+# For more detailed documentation see
+# https://atom.io/docs/latest/advanced/keymaps
+'atom-text-editor':
+  'ctrl-alt-t': 'xterm:open'
+  'ctrl-alt-right': 'xterm:open-split-right'
+  'ctrl-alt-left': 'xterm:open-split-left'
+  'ctrl-alt-up': 'xterm:open-split-up'
+  'ctrl-alt-down': 'xterm:open-split-down'
+
+  'ctrl-k t t': 'xterm:open'
+  'ctrl-k t right': 'xterm:open-split-right'
+  'ctrl-k t left': 'xterm:open-split-left'
+  'ctrl-k t up': 'xterm:open-split-up'
+  'ctrl-k t down': 'xterm:open-split-down'
+
+  'cmd-k t t': 'xterm:open'
+  'cmd-k t right': 'xterm:open-split-right'
+  'cmd-k t left': 'xterm:open-split-left'
+  'cmd-k t up': 'xterm:open-split-up'
+  'cmd-k t down': 'xterm:open-split-down'
+
+'.xterm':
+  'cmd-v': 'xterm:paste'
+  'ctrl-v': 'xterm:paste'
+  'shift-insert': 'xterm:paste'

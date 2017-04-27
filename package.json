@@ -1,9 +1,9 @@
 {
-  "name": "term3",
+  "name": "xterm",
   "main": "./index",
-  "version": "0.22.1",
+  "version": "1.0.0",
   "description": "A terminal emulator for Atom. You can run shell sessions, Vim, Emacs, htop, etc.",
-  "repository": "https://github.com/Floobits/atom-term3",
+  "repository": "https://github.com/dwb/atom-xterm",
   "license": "MIT",
   "engines": {
     "atom": ">=1.16.0"
@@ -42,14 +42,14 @@
     ]
   },
   "providedServices": {
-    "term3-service": {
-      "description": "Provides a service object with the methods: newTerm, onTerm, and getTerminals.",
+    "xterm-service": {
+      "description": "Query xterm terminals and get notified when they're created.",
       "versions": {
-        "0.1.3": "service_0_1_3"
+        "1.0.0": "provideServiceV1_0_0"
       }
     }
   },
   "deserializers": {
-    "term3/TermView": "deserializeTermView"
+    "xterm/TermView": "deserializeTermView"
   }
 }

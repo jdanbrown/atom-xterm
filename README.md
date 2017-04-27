@@ -1,63 +1,62 @@
-# Atom Term 3
+# Atom Xterm
+There have been many Atom packages that let you run a terminal in a pane tab, rather than some little panel you can't put anywhere you like. This is only the latest.
 
-Run shell sessions within Atom Editor using `term3` package.
-Run **Vim, Emacs, Htop, etc.** in Atom.
-It's based on `pty.js` as shell spawner, and `term.js` as xterm, with the power
-of Atom Package environment.
+Thanks to [term3](https://github.com/Floobits/atom-term3), which this is a fork of, all the previous forks ([term2](http://atom.io/packages/term2), [term](http://atom.io/packages/term)), and the rather good [xterm.js](https://xtermjs.org), which is what this package embeds into Atom.
 
-_Term3 is a fork and rebuilt version of [Term2](http://atom.io/packages/term2) package which was a fork of [Term](http://atom.io/packages/term) package._
+I've only tested this on macOS, but the native bits haven't changed from term3 so they should be okay.
 
-## Why is Term3 a thing ?!
+## Why the fork?
+Initially it was just to swap out the terminal emulator in term3 for xterm.js, but then it kind of took on a bunch of other things I wanted to do. It modernises the code a bit, removing a bunch of dependencies and giving it a spring clean. I also added basic serialisation, so Atom remembers you had a terminal open and reopens one after you quit and re-open.
 
-This fork fixes some bugs in upstream including [fixing the letter k](https://github.com/Floobits/atom-term3/issues/1).
-Term3 adds a terminal list above the treeview list.
-Term3 also adds a [service API](http://blog.atom.io/2015/03/25/new-services-API.html) for other plugins, like [Floobits](https://github.com/Floobits/floobits-atom), so you can pair on your terminals in addition to your code.
+## Differences with term3
+Selecting text isn't quite as good, because of lack of support in xterm.js. I hear better APIs are coming, but for now, selecting with your mouse copies straight to the clipboard and that's your lot.
 
-To install **Term3**
-
+## Installation
+The usual way:
 ```console
-$ apm install term3
+$ apm install xterm
 ```
-![Term3 in action](https://raw.githubusercontent.com/Floobits/atom-term3/master/static/term3.png)
 
 ## Key Bindings and Events
 
 | key binding | event | action |
 | ----------- | ----- | ------ |
-| `ctrl + alt + t` | `term3:open` | Opens new terminal tab pane |
-| `ctrl + alt + up`| `term3:open-split-up` | Opens new terminal tab pane in up split |
-| `ctrl + alt + right`| `term3:open-split-right` | Opens new terminal tab pane in right split |
-| `ctrl + alt + down`| `term3:open-split-down` | Opens new terminal tab pane in down split |
-| `ctrl + alt + left`| `term3:open-split-left` | Opens new terminal tab pane in left split |
-| `ctrl + k, t, t` | `term3:open` | Opens new terminal tab pane |
-| `ctrl + k, t, up`| `term3:open-split-up` | Opens new terminal tab pane in up split |
-| `ctrl + k, t, right`| `term3:open-split-right` | Opens new terminal tab pane in right split |
-| `ctrl + k, t, down`| `term3:open-split-down` | Opens new terminal tab pane in down split |
-| `ctrl + k, t, left`| `term3:open-split-left` | Opens new terminal tab pane in left split |
-| `cmd + k, t, t` | `term3:open` | Opens new terminal tab pane |
-| `cmd + k, t, up`| `term3:open-split-up` | Opens new terminal tab pane in up split |
-| `cmd + k, t, right`| `term3:open-split-right` | Opens new terminal tab pane in right split |
-| `cmd + k, t, down`| `term3:open-split-down` | Opens new terminal tab pane in down split |
-| `cmd + k, t, left`| `term3:open-split-left` | Opens new terminal tab pane in left split |
-| `ctrl + insert` | `term3:copy` | Copy text (if `ctrl + c` is not working) |
-| `shift + insert` | `term3:paste` | Paste text (if `ctrl + v` is not working) |
+| `ctrl + alt + t` | `xterm:open` | Opens new terminal tab pane |
+| `ctrl + alt + up`| `xterm:open-split-up` | Opens new terminal tab pane in up split |
+| `ctrl + alt + right`| `xterm:open-split-right` | Opens new terminal tab pane in right split |
+| `ctrl + alt + down`| `xterm:open-split-down` | Opens new terminal tab pane in down split |
+| `ctrl + alt + left`| `xterm:open-split-left` | Opens new terminal tab pane in left split |
+| `ctrl + k, t, t` | `xterm:open` | Opens new terminal tab pane |
+| `ctrl + k, t, up`| `xterm:open-split-up` | Opens new terminal tab pane in up split |
+| `ctrl + k, t, right`| `xterm:open-split-right` | Opens new terminal tab pane in right split |
+| `ctrl + k, t, down`| `xterm:open-split-down` | Opens new terminal tab pane in down split |
+| `ctrl + k, t, left`| `xterm:open-split-left` | Opens new terminal tab pane in left split |
+| `cmd + k, t, t` | `xterm:open` | Opens new terminal tab pane |
+| `cmd + k, t, up`| `xterm:open-split-up` | Opens new terminal tab pane in up split |
+| `cmd + k, t, right`| `xterm:open-split-right` | Opens new terminal tab pane in right split |
+| `cmd + k, t, down`| `xterm:open-split-down` | Opens new terminal tab pane in down split |
+| `cmd + k, t, left`| `xterm:open-split-left` | Opens new terminal tab pane in left split |
+| `ctrl + insert` | `xterm:copy` | Copy text (if `ctrl + c` is not working) |
+| `shift + insert` | `xterm:paste` | Paste text (if `ctrl + v` is not working) |
 
 ## Customize Title
 
-You can customize Title with using some variables. These are the current variables you can use:
+You can customize the title with substitution variables. These are the current variables you can use:
 
 | title variable | value |
 | -------------- | ----- |
-| `bashName` | Current Shell's name, (e.g. bash, zsh) |
+| `bashName` | current shell's name, (e.g. bash, zsh) |
 | `hostName` | OS's host name |
-| `platform` | Platform name, (e.g. darwin, linux) |
-| `home` | Home path of current user |
+| `platform` | platform name, (e.g. darwin, linux) |
+| `home` | home directory of current user |
 
 Default version of **title template** is
 
 ```
 Terminal ({{ bashName }})
 ```
+
+(I haven't tested this still works.)
 
 ## Additional Features
 
@@ -78,7 +77,7 @@ Currently, you will need to adjust the colors in `config.cson`
 You can add something like (please note the 2 examples of color format):
 
 ```cson
-term3:
+xterm:
   colors:
     normalBlack: '#000'
     normalRed:
@@ -105,40 +104,22 @@ term3:
 ```
 
 - **Colors are not taken from the Atom theme.**
-- alpha channel are not used for now.
-- _The background color is for now the only exception and is not used.
-The background is transparent so you benefit of Atom app background color._
+- I don't know if the alpha channel works, I haven't tested it.
 
 ## FAQ
 
 ### Why some commands do not work like in my previous terminal ?
+Make sure your `PATH` variable is set to what you expect. The best way to have it be set properly is to run Atom with the CLI `atom` command.
 
-It's [a known `$PATH` issue](https://github.com/floobits/atom-term3/issues/50).
-You are probably an OS X user (if not, let us know).
-GUI app doesn't get `/etc/paths` (and might come from `/usr/local/bin`).
-There is some workaround for OS X 10.9-, but OS X 10.10+ doesn't execute
-`/etc/launchd.conf` anymore.
-So, in order to get the right PATH in atom-term3 context, you have this
-solutions:
+### Why do special characters not work?
+Same answer, but with your `LANG` variable. I might add some logic to try and guess this if it's not set.
 
-- In your `.(bash|zsh|*)rc`, add
+## Versioning
 
-  ```bash
-  export PATH=$(cat /etc/paths | xargs | tr " " :)
-  # or just hardcode your path like this
-  export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
-  ```
-
-- You can automatically call a command when you open a terminal to `login` by
-editing your Atom config:
-
-  ```cson
-  term3:
-    autoRunCommand: 'login -f `whoami`'
-  ```
+I'll follow [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html) for the package overall and the service (currently undocumented, but easy code to read if you're interested). I'm not sure there's much point in carefully versioning the overall package, but I might as well. For the purposes of versioning, the public API is the registered commands and config keys with their types. For the service, it's... the service. All "own" properties of the provided object, with their argument types and return type.
 
 ---
 
-## [Contributors](https://github.com/floobits/atom-term3/graphs/contributors)
+## [Contributors](https://github.com/dwb/atom-xterm/graphs/contributors)
 
 ## [License](LICENSE)
