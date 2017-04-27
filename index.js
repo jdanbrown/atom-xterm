@@ -8,6 +8,33 @@ import store from './lib/store';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
 
+const origWorkspaceOpenURIInPane = atom.workspace.openURIInPane;
+
+let exclusiveWorkspaceOpenURIInPane;
+
+if (atom.getVersion() === '1.16.0') {
+  const paneLacksXterm = pane =>
+    pane.getItems().find(i => i instanceof TermView) == null;
+
+  exclusiveWorkspaceOpenURIInPane = function openURIInPane(
+    uri,
+    pane,
+    options = {},
+  ) {
+    let newPane = pane;
+    if (!paneLacksXterm(pane)) {
+      newPane = atom.workspace.getPanes().find(paneLacksXterm);
+      if (newPane == null) {
+        atom.workspace.addError('No non-terminal panes to open into');
+        return Promise.resolve();
+      }
+    }
+    return origWorkspaceOpenURIInPane.call(this, uri, newPane, options);
+  };
+} else {
+  console.warn(`unsupported version for exclusiveInPane: ${atom.getVersion()}`);
+}
+
 function getColors(colors) {
   const {
     normalBlack,
@@ -245,6 +272,20 @@ export default {
     );
 
     this.disposables.add(
+      atom.config.observe('xterm.exclusiveInPane', val => {
+        if (val == null || !val) {
+          atom.workspace.openURIInPane = origWorkspaceOpenURIInPane;
+        } else if (exclusiveWorkspaceOpenURIInPane != null) {
+          atom.workspace.openURIInPane = exclusiveWorkspaceOpenURIInPane;
+        } else {
+          atom.notifications.addWarning(
+            'Ignoring xterm.exclusiveInPane because this is an unsupported version of Atom. Please update xterm, or raise a bug if this persists.',
+          );
+        }
+      }),
+    );
+
+    this.disposables.add(
       atom.commands.add(
         'atom-workspace',
         'xterm:open',
@@ -314,6 +355,15 @@ export default {
   newTerm(forkPTY = true, rows = 30, cols = 80, title = 'tty') {
     const termView = this.createTermView(forkPTY, rows, cols, title);
     const pane = atom.workspace.getActivePane();
+    if (
+      atom.config.get('xterm.exclusiveInPane') &&
+      pane.getItems().length > 0
+    ) {
+      atom.notifications.addError(
+        'Terminals have to be exclusive in a pane. Please split out a new one.',
+      );
+      return null;
+    }
     termView.attachToPane(pane);
     const item = pane.addItem(termView);
     pane.activateItem(item);
