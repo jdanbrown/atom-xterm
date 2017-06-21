@@ -8,6 +8,9 @@
   "engines": {
     "atom": ">=1.16.0"
   },
+  "activationHooks": [
+    "core:loaded-shell-environment"
+  ],
   "dependencies": {
     "debounce": "^1.0.2",
     "element-resize-detector": "^1.1.11",
