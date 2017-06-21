@@ -2,11 +2,14 @@
 
 import path from 'path';
 import { CompositeDisposable, Emitter } from 'event-kit';
+import consistentEnv from 'consistent-env';
 import TermView from './lib/term-view';
 import ListView from './lib/list-view';
 import store from './lib/store';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
+
+const ENV = consistentEnv();
 
 function getColors(colors) {
   const {
@@ -203,7 +206,7 @@ const config = {
         default:
           return [];
       }
-    })(process.env),
+    })(ENV),
   },
   openPanesInSameSplit: {
     type: 'boolean',
@@ -222,7 +225,7 @@ export default {
     this.state = state;
     this.disposables = new CompositeDisposable();
 
-    if (!process.env.LANG) {
+    if (!ENV.LANG) {
       console.warn(
         'xterm: LANG environment variable is not set. Fancy characters (å, ñ, ó, etc`) may be corrupted. The only work-around is to quit Atom and run `atom` from your shell.',
       );
@@ -336,14 +339,14 @@ export default {
     if (opts.shellOverride) {
       opts.shell = opts.shellOverride;
     } else {
-      opts.shell = process.env.SHELL || 'bash';
+      opts.shell = ENV.SHELL || 'bash';
     }
 
     opts.cwd =
       opts.cwd ||
       atom.project.getPaths()[0] ||
       getFirstEditorPath() ||
-      process.env.HOME;
+      ENV.HOME;
 
     const termView = new TermView(opts);
     const model = store.addTerminal({

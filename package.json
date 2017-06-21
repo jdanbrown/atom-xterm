@@ -12,6 +12,7 @@
     "core:loaded-shell-environment"
   ],
   "dependencies": {
+    "consistent-env": "^1.3.1",
     "debounce": "^1.0.2",
     "element-resize-detector": "^1.1.11",
     "event-kit": "^2.3.0",
