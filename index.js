@@ -289,8 +289,7 @@ export default {
         }
         const node = new ListView();
         const treeView = pkg.mainModule.treeView.element;
-        const el = treeView.querySelector('.tree-view-scroller');
-        el.insertBefore(node, el.firstChild);
+        treeView.insertBefore(node, treeView.firstChild);
       }),
     );
   },
