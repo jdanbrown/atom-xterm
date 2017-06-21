@@ -225,12 +225,6 @@ export default {
     this.state = state;
     this.disposables = new CompositeDisposable();
 
-    if (!ENV.LANG) {
-      console.warn(
-        'xterm: LANG environment variable is not set. Fancy characters (å, ñ, ó, etc`) may be corrupted. The only work-around is to quit Atom and run `atom` from your shell.',
-      );
-    }
-
     ['up', 'right', 'down', 'left'].forEach(direction =>
       this.disposables.add(
         atom.commands.add(
