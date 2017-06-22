@@ -20,7 +20,8 @@
     "ptyw.js": "0.4.x",
     "react-atom-fork": "0.11.x",
     "redux": "^3.6.0",
-    "xterm": "~2.7.0"
+    "xterm": "~2.7.0",
+    "os-locale": "^2.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.2",
@@ -32,7 +33,6 @@
     "eslint-plugin-react": "^6.10.3",
     "husky": "^0.13.3",
     "lint-staged": "^3.4.0",
-    "os-locale": "^2.0.0",
     "prettier": "^1.2.2"
   },
   "scripts": {
