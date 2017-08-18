@@ -20,7 +20,7 @@
     "ptyw.js": "0.4.x",
     "react-atom-fork": "0.11.x",
     "redux": "^3.6.0",
-    "xterm": "~2.7.0",
+    "xterm": "~2.9.2",
     "os-locale": "^2.0.0"
   },
   "devDependencies": {
