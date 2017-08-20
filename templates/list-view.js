@@ -30,7 +30,9 @@ const TerminalView = React.createClass({
         onMouseDown={this.onMouseDown}
         className={`${sel ? 'selected' : ''} list-item`}
       >
-        <span className="icon icon-terminal">{t.title}</span>
+        <span className="icon icon-terminal">
+          {t.title}
+        </span>
       </li>
     );
   },
@@ -78,17 +80,19 @@ const ListView = React.createClass({
     if (terminals == null || !terminals.length) {
       return <div />;
     }
-    const terms = terminals.map(t => (
+    const terms = terminals.map(t =>
       <TerminalView
         terminal={t}
         selected={t.id === activeTerminalId}
         key={t.id}
-      />
-    ));
+      />,
+    );
     return (
       <ol className="list-tree has-collapsable-children">
         <li
-          className={`list-nested-item project-root ${collapsed ? 'collapsed' : 'expanded'}`}
+          className={`list-nested-item project-root ${collapsed
+            ? 'collapsed'
+            : 'expanded'}`}
         >
           <div
             className="header list-item project-root-header"
