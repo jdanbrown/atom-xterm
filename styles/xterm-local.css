@@ -1,0 +1,3 @@
+.xterm-rows > div > span {
+    display: inline-block;
+}
