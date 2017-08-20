@@ -262,6 +262,13 @@ export default {
         this.pipeTerm.bind(this, 'selection'),
       ),
     );
+    this.disposables.add(
+      atom.commands.add('.xterm', 'core:copy', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.copyTerminalSelection();
+      }),
+    );
 
     this.disposables.add(
       atom.workspace.addOpener(uri => {
@@ -432,6 +439,11 @@ export default {
       this.focusedTerminal.input(stream.trim());
       this.focusedTerminal.focusAndActivatePane();
     }
+  },
+
+  copyTerminalSelection() {
+    if (this.focusedTerminal == null) return;
+    atom.clipboard.write(this.focusedTerminal.getSelection());
   },
 
   handleRemoveTerm(termView) {
