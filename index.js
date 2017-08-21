@@ -3,6 +3,7 @@
 import path from 'path';
 import { CompositeDisposable, Emitter } from 'event-kit';
 import consistentEnv from 'consistent-env';
+import { keystrokeForKeyboardEvent } from 'atom-keymap/lib/helpers';
 import TermView from './lib/term-view';
 import ListView from './lib/list-view';
 import store from './lib/store';
@@ -105,6 +106,15 @@ const config = {
   fontSize: {
     type: 'string',
     default: '',
+  },
+  ignoreKeystrokes: {
+    description:
+      'Keystrokes (in Atom keymap format, comma-separated) which should be ignored by the terminal.',
+    type: 'array',
+    default: [],
+    items: {
+      type: 'string',
+    },
   },
   colors: {
     type: 'object',
@@ -242,6 +252,12 @@ export default {
     );
 
     this.disposables.add(
+      atom.config.observe('xterm.ignoreKeystrokes', ks => {
+        this.ignoreTerminalKeystrokes = new Set(ks);
+      }),
+    );
+
+    this.disposables.add(
       atom.commands.add(
         'atom-workspace',
         'xterm:open',
@@ -314,6 +330,16 @@ export default {
     return this.emitter.on('term', callback);
   },
 
+  handleTerminalKey(e) {
+    const ks = this.ignoreTerminalKeystrokes;
+    if (ks == null || ks.size === 0) return true;
+    const keystroke = keystrokeForKeyboardEvent(e);
+    if (ks.has(keystroke)) {
+      return false;
+    }
+    return true;
+  },
+
   newTerm(forkPTY = true, rows = 30, cols = 80, title = 'tty') {
     const termView = this.createTermView(forkPTY, rows, cols, title);
     const pane = atom.workspace.getActivePane();
@@ -335,6 +361,7 @@ export default {
       forkPTY,
       rows,
       cols,
+      keyHandler: this.handleTerminalKey.bind(this),
     };
 
     if (opts.shellOverride) {
