@@ -69,7 +69,39 @@ Terminal ({{ bashName }})
   - You can **pipe the text and paths** to the Terminal sessions.
   - Paste from clipboard
 
-### Note about colors
+## Version History
+
+### 1.1.0
+* Upgrade xterm.js to [2.9.2](https://github.com/sourcelair/xterm.js/releases/tag/2.9.2).
+  * Most significantly, this changes selection so that it's good now, and copying to clipboard works like elsewhere: select text, use regular "Copy" command or shortcut, and then optionally deselect or whatever.
+* Added support for selectively ignoring keystrokes. Have a look at the Settings view. I added this because I use `cmd-a` as a prefix for navigating panes, and normally that would do "Select All" in the terminal before Atom would capture it – so now I can add `cmd-a` to the option in `xterm` settings, and it now doesn't do that. Very handy.
+
+### 1.0.5
+* [Replace non-breaking spaces with regular spaces in selection handler](https://github.com/dwb/atom-xterm/pull/2) – thanks [adrianmalacoda](https://github.com/adrianmalacoda) for catching my silly mistake.
+
+### 1.0.4
+* Upgrade xterm.js to [2.7.0](https://github.com/sourcelair/xterm.js/releases/tag/2.7.0).
+* [Replace non-breaking spaces with regular spaces in selection handler](https://github.com/dwb/atom-xterm/pull/1) – thanks [adrianmalacoda](https://github.com/adrianmalacoda).
+* Guess LANG environment variable if required.
+* Try to guess shell environment better on macOS.
+
+### 1.0.3
+* Don't pass `NODE_ENV` and `NODE_PATH` to terminal processes
+
+### 1.0.2
+* Fixed UTF-8 input (assumes UTF-8 locale!)
+
+### 1.0.1
+* Fixed paste and scroll command targetting
+
+### 1.0.0
+* Initial version with [xterm.js](https://xtermjs.org)
+
+## Known Issues
+* Running Neovim ≤ 0.2 (and possibly other fancy GUI-ish terminal apps) inside a terminal immediately pulls focus back to the terminal pane on blur, and Neovim > 0.2 is very broken. (Obviously running Neovim long-term inside a terminal pane in Atom is an odd thing to do, but it's still my editor for git messages).
+* The terminal list in the tree view is currently broken.
+
+## Note about colors
 
 Currently, you will need to adjust the colors in `config.cson`
 (then you should be able to edit them in the package settings view).
