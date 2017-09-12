@@ -17,7 +17,7 @@ The usual way:
 $ apm install xterm
 ```
 
-## Key Bindings and Events
+## Key Bindings
 
 | key binding | event | action |
 | ----------- | ----- | ------ |
@@ -38,6 +38,7 @@ $ apm install xterm
 | `cmd + k, t, left`| `xterm:open-split-left` | Opens new terminal tab pane in left split |
 | `ctrl + insert` | `xterm:copy` | Copy text (if `ctrl + c` is not working) |
 | `shift + insert` | `xterm:paste` | Paste text (if `ctrl + v` is not working) |
+| `cmd + k, cmd + k` | `xterm:clear-scrollback` | Clears the scrollback buffer of the active terminal |
 
 ## Customize Title
 

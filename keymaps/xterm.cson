@@ -28,5 +28,9 @@
 
 '.xterm':
   'cmd-v': 'xterm:paste'
-  'ctrl-v': 'xterm:paste'
+  'ctrl-insert': 'xterm:copy'
   'shift-insert': 'xterm:paste'
+  # Unfortunately (as it is the default for "Clear Scrollback" in macOS's
+  # Terminal.app, iTerm, etc), singular `cmd-k` is used as a prefix for a lot of
+  # standard commands.
+  'cmd-k cmd-k': 'xterm:clear-scrollback'

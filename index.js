@@ -285,6 +285,11 @@ export default {
         this.copyTerminalSelection();
       }),
     );
+    atom.commands.add('.xterm', 'xterm:clear-scrollback', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.clearActiveTerm();
+    });
 
     this.disposables.add(
       atom.workspace.addOpener(uri => {
@@ -471,6 +476,11 @@ export default {
   copyTerminalSelection() {
     if (this.focusedTerminal == null) return;
     atom.clipboard.write(this.focusedTerminal.getSelection());
+  },
+
+  clearActiveTerm() {
+    if (this.focusedTerminal == null) return;
+    this.focusedTerminal.clear();
   },
 
   handleRemoveTerm(termView) {
