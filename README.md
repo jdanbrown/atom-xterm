@@ -72,6 +72,9 @@ Terminal ({{ bashName }})
 
 ## Version History
 
+### 1.2.0
+* Added `xterm:clear-scrollback` command to… clear the scrollback of the active terminal.
+
 ### 1.1.0
 * Upgrade xterm.js to [2.9.2](https://github.com/sourcelair/xterm.js/releases/tag/2.9.2).
   * Most significantly, this changes selection so that it's good now, and copying to clipboard works like elsewhere: select text, use regular "Copy" command or shortcut, and then optionally deselect or whatever.
