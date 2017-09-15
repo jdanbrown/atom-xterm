@@ -20,7 +20,7 @@
   '.xterm': [
     {
       'label': 'Copy'
-      'command': 'xterm:copy'
+      'command': 'core:copy'
     }
     {
       'label': 'Paste'
