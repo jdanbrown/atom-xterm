@@ -72,6 +72,9 @@ Terminal ({{ bashName }})
 
 ## Version History
 
+### 1.2.1
+* [Fixed "Copy" context menu command](https://github.com/dwb/atom-xterm/pull/5) – thanks [adrianmalacoda](https://github.com/adrianmalacoda).
+
 ### 1.2.0
 * Added `xterm:clear-scrollback` command to… clear the scrollback of the active terminal.
 
