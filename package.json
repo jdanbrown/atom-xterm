@@ -3,7 +3,7 @@
   "main": "./index",
   "version": "1.2.1",
   "description": "A terminal emulator for Atom. You can run shell sessions, Vim, Emacs, htop, etc.",
-  "repository": "https://github.com/dwb/atom-xterm",
+  "repository": "https://github.com/jdanbrown/xterm",
   "license": "MIT",
   "engines": {
     "atom": ">=1.16.0"
