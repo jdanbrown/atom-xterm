@@ -8,6 +8,8 @@ import TermView from './lib/term-view';
 import ListView from './lib/list-view';
 import store from './lib/store';
 
+const URL = require('url');
+
 const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
 
 const ENV = consistentEnv();
@@ -293,9 +295,11 @@ export default {
 
     this.disposables.add(
       atom.workspace.addOpener(uri => {
-        if (uri === 'atom://xterm-term-view') {
-          this.newTerm();
+        const { protocol, host, query } = URL.parse(uri, true);
+        if (protocol === 'atom:' && host === 'xterm-term-view') {
+          return this.newTerm({ state: query });
         }
+        return undefined;
       }),
     );
 
@@ -345,8 +349,10 @@ export default {
     return true;
   },
 
-  newTerm(forkPTY = true, rows = 30, cols = 80, title = 'tty') {
-    const termView = this.createTermView(forkPTY, rows, cols, title);
+  newTerm(
+    { forkPTY = true, rows = 30, cols = 80, title = 'tty', state = {} } = {},
+  ) {
+    const termView = this.createTermView({ forkPTY, rows, cols, title, state });
     const pane = atom.workspace.getActivePane();
     termView.attachToPane(pane);
     const item = pane.addItem(termView);
@@ -354,8 +360,11 @@ export default {
     return termView;
   },
 
-  createTermView(forkPTY = true, rows = 30, cols = 80, title = 'tty') {
+  createTermView(
+    { forkPTY = true, rows = 30, cols = 80, title = 'tty', state = {} } = {},
+  ) {
     const opts = {
+      state,
       runCommand: atom.config.get('xterm.autoRunCommand'),
       shellOverride: atom.config.get('xterm.shellOverride'),
       shellArguments: atom.config.get('xterm.shellArguments'),
@@ -494,7 +503,7 @@ export default {
     this.disposables.dispose();
   },
 
-  deserializeTermView() {
-    return this.createTermView();
+  deserializeTermView(state) {
+    return this.createTermView({ state });
   },
 };
