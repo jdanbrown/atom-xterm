@@ -1,6 +1,7 @@
 'use babel';
 
 import path from 'path';
+import fs from 'fs-plus';
 import { CompositeDisposable, Emitter } from 'event-kit';
 import consistentEnv from 'consistent-env';
 import { keystrokeForKeyboardEvent } from 'atom-keymap/lib/helpers';
@@ -366,15 +367,28 @@ export default {
   getDirForActivePaneItem() {
     const item = atom.workspace.getActivePaneItem();
     if (item) {
-      // TextEditor
       if (item.getPath && item.getPath()) {
-        return path.dirname(item.getPath());
-        // TermView
+        // TextEditor
+        const p = item.getPath();
+        return this.findProjectDirContainingPath(p) || path.dirname(p);
       } else if (item.term) {
+        // TermView
         return item.opts.cwd;
       }
     }
     return null;
+  },
+
+  findProjectDirContainingPath(path) {
+    const allDirs = atom.workspace.project.getDirectories().map((x) => x.path);
+    const dirs = allDirs.filter((dir) => fs.absolute(path).startsWith(fs.absolute(dir)));
+    if (dirs.length === 0) {
+      return null;
+    } else if (dirs.length === 1) {
+      return dirs[0];
+    } else {
+      throw Error(`Expected one project dir containing path[${path}], got multiple: ${dirs}`);
+    }
   },
 
   createTermView(
