@@ -57,14 +57,6 @@ function getColors(colors) {
   ].map(color => (color.toHexString == null ? color : color.toHexString()));
 }
 
-function getFirstEditorPath() {
-  const editors = atom.workspace.getTextEditors();
-  if (editors.length > 0) {
-    return editors[0].getPath();
-  }
-  return undefined;
-}
-
 function createColorsStyleSheet(colors) {
   const title = 'xterm-colors';
   let ssEl = document.querySelector(`style[title="${title}"]`);
@@ -297,7 +289,7 @@ export default {
       atom.workspace.addOpener(uri => {
         const { protocol, host, query } = URL.parse(uri, true);
         if (protocol === 'atom:' && host === 'xterm-term-view') {
-          return this.newTerm({ state: query });
+          return this.newTerm({ opts: query });
         }
         return undefined;
       }),
@@ -350,9 +342,20 @@ export default {
   },
 
   newTerm(
-    { forkPTY = true, rows = 30, cols = 80, title = 'tty', state = {} } = {},
+    { forkPTY = true, rows = 30, cols = 80, title = 'tty', opts = {} } = {},
   ) {
-    const termView = this.createTermView({ forkPTY, rows, cols, title, state });
+    const activeItemPath = this.getDirForActivePaneItem();
+    const cwd = activeItemPath || ENV.HOME;
+    const termView = this.createTermView({
+      forkPTY,
+      rows,
+      cols,
+      title,
+      opts: {
+        ...opts,
+        cwd: opts.cwd || cwd,
+      },
+    });
     const pane = atom.workspace.getActivePane();
     termView.attachToPane(pane);
     const item = pane.addItem(termView);
@@ -360,13 +363,30 @@ export default {
     return termView;
   },
 
+  getDirForActivePaneItem() {
+    const item = atom.workspace.getActivePaneItem();
+    if (item) {
+      // TextEditor
+      if (item.getPath && item.getPath()) {
+        return path.dirname(item.getPath());
+        // TermView
+      } else if (item.term) {
+        return item.opts.cwd;
+      }
+    }
+    return null;
+  },
+
   createTermView(
-    { forkPTY = true, rows = 30, cols = 80, title = 'tty', state = {} } = {},
+    { forkPTY = true, rows = 30, cols = 80, title = 'tty', opts = {} } = {},
   ) {
-    const opts = {
-      state,
+    const shellOverride = atom.config.get('xterm.shellOverride');
+
+    const termView = new TermView({
+      cwd: ENV.HOME,
       runCommand: atom.config.get('xterm.autoRunCommand'),
-      shellOverride: atom.config.get('xterm.shellOverride'),
+      shell: shellOverride || ENV.SHELL || 'bash',
+      shellOverride,
       shellArguments: atom.config.get('xterm.shellArguments'),
       titleTemplate: atom.config.get('xterm.titleTemplate'),
       cursorBlink: atom.config.get('xterm.cursorBlink'),
@@ -376,21 +396,8 @@ export default {
       rows,
       cols,
       keyHandler: this.handleTerminalKey.bind(this),
-    };
-
-    if (opts.shellOverride) {
-      opts.shell = opts.shellOverride;
-    } else {
-      opts.shell = ENV.SHELL || 'bash';
-    }
-
-    opts.cwd =
-      opts.cwd ||
-      atom.project.getPaths()[0] ||
-      getFirstEditorPath() ||
-      ENV.HOME;
-
-    const termView = new TermView(opts);
+      ...opts,
+    });
     const model = store.addTerminal({
       local: !!forkPTY,
       term: termView,
@@ -504,6 +511,6 @@ export default {
   },
 
   deserializeTermView(state) {
-    return this.createTermView({ state });
+    return this.createTermView({ opts: state });
   },
 };
