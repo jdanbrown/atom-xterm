@@ -18,11 +18,12 @@
     "element-resize-detector": "^1.1.11",
     "event-kit": "^2.3.0",
     "fs-plus": "^2.2.3",
-    "node-pty": "0.8.1",
+    "node-pty": "0.9.0",
     "react-atom-fork": "0.11.x",
     "redux": "^3.6.0",
     "xterm": "~2.9.2",
-    "os-locale": "^2.0.0"
+    "os-locale": "^2.0.0",
+    "nan": "^2.14.2"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.2",
